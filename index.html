@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canlı Taraftar Sohbeti | RM Türkiye</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-left">
+            <a href="index.html" class="brand">
+                <img src="logo.jpg" alt="RM Türkiye Logo" class="logo-circle logo-sm">
+                <div class="brand-title">
+                    <strong>RM <span>TÜRKİYE</span></strong>
+                    <small>Canlı Taraftar Sohbeti</small>
+                </div>
+            </a>
+            <span class="season-badge">CANLI ODA</span>
+        </div>
+        <div class="topbar-right">
+            <a href="https://instagram.com/realmadridcf.turkiye" target="_blank" rel="noopener noreferrer" class="ig-btn">Instagram</a>
+        </div>
+    </header>
+
+    <nav class="main-nav">
+        <a href="index.html">Ana Sayfa</a>
+        <a href="haberler.html">Haberler</a>
+        <a href="fikstur.html">Fikstür & Puan</a>
+        <a href="tarihce.html">Tarihçe</a>
+        <a href="tasarimlar.html">Tasarımlar</a>
+        <a href="quiz.html">Bilgi Testi</a>
+        <a href="sohbet.html" class="active">Taraftar Sohbeti</a>
+    </nav>
+
+    <main class="page">
+        <div class="sec-head">
+            <h2><span>Canlı</span> Taraftar Sohbeti</h2>
+            <span class="season-badge" id="online-status">Bağlanıyor...</span>
+        </div>
+
+        <div class="card chat-box-panel">
+            <div id="nick-setup" class="chat-form">
+                <input type="text" id="chat-nick" class="search-box chat-nick" placeholder="Rumuzunu gir (örn. Emir)" maxlength="24">
+                <button type="button" id="save-nick-btn" class="btn-gold">Sohbete Başla</button>
+            </div>
+
+            <div id="active-nick-bar" class="chat-form" style="display: none; align-items: center; justify-content: space-between;">
+                <span>Rumuz: <strong id="current-nick-label"></strong></span>
+                <button type="button" id="change-nick-btn" class="btn-dark">Rumuz Değiştir</button>
+            </div>
+
+            <div class="chat-messages" id="chat-messages">
+                <div class="chat-msg-row">
+                    <div class="chat-msg-head">
+                        <strong>RM Türkiye</strong>
+                        <span>Sistem</span>
+                    </div>
+                    <p>Sohbet odasına hoş geldin! Buraya yazılan mesajlar odaya giren tüm taraftarlarda görünür.</p>
+                </div>
+            </div>
+
+            <form id="chat-form" class="chat-form" style="display: none;">
+                <input type="text" id="chat-input" class="search-box chat-msg-input" placeholder="Maç veya gündem hakkında bir şeyler yaz..." maxlength="240" required>
+                <button type="submit" class="btn-gold">Gönder</button>
+            </form>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-brand">
+            <img src="logo.jpg" alt="RM Türkiye" class="logo-circle logo-sm">
+            <div>
+                <strong>© 2026 RM Türkiye</strong>
+                <p>Bağımsız taraftar platformudur.</p>
+            </div>
+        </div>
+        <a href="index.html" class="btn-dark">← Ana Sayfaya Dön</a>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getDatabase, ref, push, onChildAdded, query, limitToLast } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB7tEEF9KguqMiKbDVB6Bggf6vNaNdKHw8",
+            authDomain: "rmturkiyesohbet.firebaseapp.com",
+            databaseURL: "https://rmturkiyesohbet-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "rmturkiyesohbet",
+            storageBucket: "rmturkiyesohbet.firebasestorage.app",
+            messagingSenderId: "200081897418",
+            appId: "1:200081897418:web:9b4a839c6d2763e7c1c133"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const messagesRef = query(ref(db, "sohbet_mesajlari"), limitToLast(60));
+
+        const nickSetup = document.getElementById("nick-setup");
+        const activeNickBar = document.getElementById("active-nick-bar");
+        const currentNickLabel = document.getElementById("current-nick-label");
+        const nickInput = document.getElementById("chat-nick");
+        const saveNickBtn = document.getElementById("save-nick-btn");
+        const changeNickBtn = document.getElementById("change-nick-btn");
+
+        const chatForm = document.getElementById("chat-form");
+        const msgInput = document.getElementById("chat-input");
+        const chatMessages = document.getElementById("chat-messages");
+        const onlineStatus = document.getElementById("online-status");
+
+        onlineStatus.textContent = "ÇEVRİMİÇİ";
+
+        function applyNickState(nick) {
+            if (nick && nick.trim()) {
+                const clean = nick.trim();
+                localStorage.setItem("rm_chat_nick", clean);
+                currentNickLabel.textContent = clean;
+                nickSetup.style.display = "none";
+                activeNickBar.style.display = "flex";
+                chatForm.style.display = "flex";
+                msgInput.focus();
+            } else {
+                localStorage.removeItem("rm_chat_nick");
+                nickSetup.style.display = "flex";
+                activeNickBar.style.display = "none";
+                chatForm.style.display = "none";
+                nickInput.value = "";
+                nickInput.focus();
+            }
+        }
+
+        saveNickBtn.addEventListener("click", () => {
+            const val = nickInput.value.trim() || "Madridista";
+            applyNickState(val);
+        });
+
+        nickInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                saveNickBtn.click();
+            }
+        });
+
+        changeNickBtn.addEventListener("click", () => {
+            applyNickState("");
+        });
+
+        applyNickState(localStorage.getItem("rm_chat_nick") || "");
+
+        function addMessageToScreen(data) {
+            const row = document.createElement("div");
+            row.className = "chat-msg-row";
+
+            const head = document.createElement("div");
+            head.className = "chat-msg-head";
+
+            const nickEl = document.createElement("strong");
+            nickEl.textContent = data.nick || "Madridista";
+
+            const timeEl = document.createElement("span");
+            timeEl.textContent = data.time || "";
+
+            const textEl = document.createElement("p");
+            textEl.textContent = data.text || "";
+
+            head.appendChild(nickEl);
+            head.appendChild(timeEl);
+            row.appendChild(head);
+            row.appendChild(textEl);
+            chatMessages.appendChild(row);
+
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        onChildAdded(messagesRef, (snapshot) => {
+            const val = snapshot.val();
+            if (val) addMessageToScreen(val);
+        });
+
+        chatForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const nick = localStorage.getItem("rm_chat_nick") || "Madridista";
+            const text = msgInput.value.trim();
+            if (!text) return;
+
+            const time = new Date().toLocaleTimeString("tr-TR", {
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+
+            await push(ref(db, "sohbet_mesajlari"), {
+                nick,
+                text,
+                time,
+                createdAt: Date.now()
+            });
+
+            msgInput.value = "";
+            msgInput.focus();
+        });
+    </script>
+</body>
+</html>

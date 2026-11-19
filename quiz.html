@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilgi Testi | RM Türkiye</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-left">
+            <a href="index.html" class="brand">
+                <img src="logo.jpg" alt="RM Türkiye Logo" class="logo-circle logo-sm">
+                <div class="brand-title"><strong>RM <span>TÜRKİYE</span></strong><small>Madridista Bilgi Testi</small></div>
+            </a>
+        </div>
+        <div class="topbar-right">
+            <a href="https://instagram.com/realmadridcf.turkiye" target="_blank" rel="noopener noreferrer" class="ig-btn">Instagram</a>
+        </div>
+    </header>
+
+    <nav class="main-nav">
+        <a href="index.html">Ana Sayfa</a>
+        <a href="haberler.html">Haberler</a>
+        <a href="fikstur.html">Fikstür & Puan</a>
+        <a href="tarihce.html">Tarihçe</a>
+        <a href="tasarimlar.html">Tasarımlar</a>
+        <a href="quiz.html" class="active">Bilgi Testi</a>
+    </nav>
+
+    <main class="page">
+        <div class="sec-head">
+            <h2><span>Taraftar</span> Bilgi Testi</h2>
+        </div>
+
+        <div class="quiz-panel">
+            <div class="quiz-top">
+                <span id="q-step">Soru 1 / 3</span>
+                <span id="q-points">Puan: 0</span>
+            </div>
+            <h3 id="q-title">Soru yükleniyor...</h3>
+            <div class="options-stack" id="q-choices"></div>
+            <p class="quiz-note" id="q-msg"></p>
+            <button type="button" class="btn-gold hidden" id="q-next">Sonraki Soru</button>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-brand">
+            <img src="logo.jpg" alt="RM Türkiye" class="logo-circle logo-sm">
+            <div><strong>© 2026 RM Türkiye</strong><p>Bağımsız taraftar platformudur.</p></div>
+        </div>
+        <a href="index.html" class="btn-dark">← Ana Sayfaya Dön</a>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
